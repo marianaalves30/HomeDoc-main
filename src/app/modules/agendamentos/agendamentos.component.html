@@ -1,0 +1,146 @@
+<!-- Header -->
+<nav class="navbar navbar-expand-md navbar-dark menu">
+  <div class="container-fluid">
+    <a class="navbar-brand">HomeDoc</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a class="nav-link link-ativado" title="Agendamentos" >Agendamentos</a>
+        </li>
+      </ul>
+      <span class="text-white">Olá, {{name}}</span>
+      <a class="nav-link link-ativado" title="Sair" (click)='logaut()'><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+  </div>
+</nav> 
+
+<!-- Mensagens de retorno -->
+<div class="msg">
+  <!-- Mensagem de erro -->
+  <div *ngIf="displayErro == 'listview'" [ngStyle]="{'display': displayErro}" class="toast align-items-center text-white bg-danger border-0 msgGeral" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        {{msgErro}}
+      </div>
+      <button type="button" (click)='closeToast(2);' class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Mensagem de sucesso -->
+  <div *ngIf="displaySuccess == 'listview'" [ngStyle]="{'display': displaySuccess}" class="toast align-items-center text-white bg-success border-0 msgGeral" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        Agendamento realizado com sucesso.
+      </div>
+      <button type="button" (click)='closeToast(1);' class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Body -->
+<div class="container">
+
+  <!-- Cadastrar agendamento -->
+  <div class="row bloco-cadastrar">
+    <div class="col-12">
+      <div class="form-control bloco-cadastrar-base">
+        <h4>Agendamento</h4>
+        <form class="row g-3 bloco-margin" [formGroup]="agendamento" (ngSubmit)="salvarAgendamento()">
+          
+              <div class="col-xl-1 col-md-2 col-3" style="padding-left: 0px;">
+                <label for="medico" class="col-form-label">Médico (a):</label>
+              </div>
+              <div class="col-xl-4 col-md-10 col-9">
+                <select (ngModelChange)='showEndereco()' class="form-select" id="escolha" formControlName="idDoctor">
+                  <option value="0" selected>Selecione...</option>
+                  <option value="1">Dr. João Borges - Ancologista</option>
+                  <option value="2">Dra. Marcela Oliveira - Ginecologista</option>
+                  <option value="3">Dra. Brenda Oliveira - Cardiologista</option>
+              </select>
+              </div>
+              <div class="col-xl-1 col-md-2 col-3">
+                <label for="data" class="col-form-label">Data:</label>
+              </div>
+              <div class="col-xl-4 col-md-10 col-9">
+                <input class="form-select" type="datetime-local" formControlName="startDate" for="data">
+              </div>
+              <div class="col-xl-2 col-md-12 col-12" style="text-align: center;">
+                <button *ngIf='!salvando' type="submit" class="btn btn-success" title="Agendar">Agendar</button>
+                <button *ngIf='salvando' class="btn btn-success " type="submit" disabled>
+                  <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                  Agendando...
+                </button>
+              </div>
+              <div *ngIf='adress' class="col-12" style="text-align: center;">
+                <div style="width: 100%;" class="alert alert-warning" role="alert">
+                  {{ descAdress }}
+                </div>
+              </div>
+            
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Listar agendamentos -->
+  <h4 *ngIf="msgListaAgendamento == '' && !carregando" class="ano">2021</h4>
+  <div *ngFor="let agendamento of listaAgendamentos">
+    
+    <div class="row">
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-5 col-2"> 
+          <h5 class="titulo">{{agendamento.startDate.split('T')[0].split("-")[2]}}
+            <br>
+            {{agendamento.dayOfWeek.toUpperCase()}}
+          </h5>
+          <b class="divisoria">-</b>
+          <h5 class="mes">{{getMes(agendamento.startDate.split('T')[0].split("-")[1])}}</h5>
+          <div class="circulo"></div>
+      </div>
+      <div class="col-xl-10 col-lg-9 col-md-8 col-sm-7 col-10"> 
+        <hr class="linha-horizontal">
+      </div>
+    </div>
+
+    <div class="row left-content-md-center" style="margin-top: 0px;" *ngIf='!agendamento.confirmed'>
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-5 col-2"></div>
+      <div class="col-xl-10 col-lg-9 col-md-8 col-sm-7 col-10"> 
+        <div class="alert alert-warning" role="alert" style="border-color: #664d03;">
+          <b style="float: left;">{{agendamento.nameDoctor}} - Horário {{ agendamento.startDate.split('T')[1].split(':')[0] + ':' +agendamento.startDate.split('T')[1].split(':')[1]}}</b>    <b style="float: right; color:#cc9900">Pendente</b>
+          <br>
+          <span>{{agendamento.adress}}</span>
+        </div>
+      </div>
+    </div> 
+  
+    <div class="row left-content-md-center" style="margin-top: 0px;" *ngIf='agendamento.confirmed'>
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-5 col-2"></div>
+      <div class="col-xl-10 col-lg-9 col-md-8 col-sm-7 col-10"> 
+        <div class="alert alert-success" role="alert" style="border-color: #157347;">
+          <b style="float: left;">{{agendamento.nameDoctor}} - Horário {{ agendamento.startDate.split('T')[1].split(':')[0] + ':' +agendamento.startDate.split('T')[1].split(':')[1]}}</b>  
+          <b style="float: right; color:#157347">Confirmado</b>
+          <br>
+          <span>{{agendamento.adress}}</span>
+        </div>
+      </div>
+    </div> 
+
+  </div>
+
+  <div *ngIf="msgListaAgendamento != '' && !carregando">
+    <div class="alert alert-warning vazio" role="alert">
+      {{ msgListaAgendamento }}
+    </div>
+  </div>
+
+  <div *ngIf='carregando' style="text-align: center;">
+    <img src="../../../assets/gifs/loading.gif" width="100">
+    <br>
+    <span>Carregando...</span>
+  </div>
+</div>
+
+

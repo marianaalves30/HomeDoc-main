@@ -1,0 +1,8 @@
+<div style="opacity: 1; float: right; margin: 5px;" *ngIf="display == 'listview'" [ngStyle]="{'display': display}" class="toastalign-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="d-flex">
+    <div class="toast-body">
+      Agendamento realizado com sucesso.
+    </div>
+    <button type="button" (click)='closeToast();' class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+</div>
